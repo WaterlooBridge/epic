@@ -37,7 +37,6 @@ class Trampoline {
     private final byte[] originalCode;
     private int trampolineSize;
     private long trampolineAddress;
-    private boolean active;
 
     // private ArtMethod artOrigin;
     private Set<ArtMethod> segments = new HashSet<>();
@@ -48,7 +47,7 @@ class Trampoline {
         this.originalCode = EpicNative.get(jumpToAddress, shellCode.sizeOfDirectJump());
     }
 
-    public boolean install(ArtMethod originMethod){
+    public boolean install(ArtMethod originMethod) {
         boolean modified = segments.add(originMethod);
         if (!modified) {
             // Already hooked, ignore
@@ -98,9 +97,7 @@ class Trampoline {
             trampolineSize = 0;
         }
 
-        if (active) {
-            EpicNative.put(originalCode, jumpToAddress);
-        }
+        EpicNative.put(originalCode, jumpToAddress);
     }
 
     private int getSize() {
@@ -143,7 +140,7 @@ class Trampoline {
         super.finalize();
     }
 
-    private byte[] createTrampoline(ArtMethod source){
+    private byte[] createTrampoline(ArtMethod source) {
         final Epic.MethodInfo methodInfo = Epic.getMethodInfo(source.getAddress());
         final Class<?> returnType = methodInfo.returnType;
 
@@ -158,10 +155,10 @@ class Trampoline {
         long sourceAddress = source.getAddress();
         long structAddress = EpicNative.malloc(4);
 
-        Logger.d(TAG, "targetAddress:"+ Debug.longHex(targetAddress));
-        Logger.d(TAG, "sourceAddress:"+ Debug.longHex(sourceAddress));
-        Logger.d(TAG, "targetEntry:"+ Debug.longHex(targetEntry));
-        Logger.d(TAG, "structAddress:"+ Debug.longHex(structAddress));
+        Logger.d(TAG, "targetAddress:" + Debug.longHex(targetAddress));
+        Logger.d(TAG, "sourceAddress:" + Debug.longHex(sourceAddress));
+        Logger.d(TAG, "targetEntry:" + Debug.longHex(targetEntry));
+        Logger.d(TAG, "structAddress:" + Debug.longHex(structAddress));
 
         return shellCode.createBridgeJump(targetAddress, targetEntry, sourceAddress, structAddress);
     }
